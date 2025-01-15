@@ -14,6 +14,7 @@
             background-size: cover;
             background-position: center;
             height: 100vh;
+            display: none; /* Hanya untuk menyembunyikan halaman saat URL dengan ?text= digunakan */
         }
         canvas {
             border: 2px solid #ccc;
@@ -72,7 +73,6 @@
     </footer>
 
     <script>
-        // Fungsi utama untuk membuat brat
         function generateBrat(input) {
             const canvas = document.getElementById('bratCanvas');
             const ctx = canvas.getContext('2d');
@@ -147,23 +147,11 @@
             }
         }
 
-        // Fungsi untuk menampilkan gambar secara fullscreen
-        function viewFullImage() {
+        // Fungsi untuk membuka gambar langsung
+        function openAsImage() {
             const canvas = document.getElementById('bratCanvas');
             const imgURL = canvas.toDataURL('image/png');
-            const newTab = window.open();
-            newTab.document.body.style.margin = '0';
-            newTab.document.body.style.background = '#000';
-            newTab.document.body.innerHTML = `<img src="${imgURL}" style="display: block; margin: auto; max-width: 100%; max-height: 100%;">`;
-        }
-
-        // Fungsi untuk mengunduh gambar
-        function downloadImage() {
-            const canvas = document.getElementById('bratCanvas');
-            const link = document.createElement('a');
-            link.download = 'brat.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            document.body.innerHTML = `<img src="${imgURL}" style="width: 100%; height: 100%;">`;
         }
 
         // Mendukung API dengan membaca parameter dari URL
@@ -172,6 +160,9 @@
             const text = urlParams.get('text');
             if (text) {
                 generateBrat(text);
+                setTimeout(openAsImage, 100); // Tunggu render canvas sebelum menampilkan sebagai gambar
+            } else {
+                document.body.style.display = 'block'; // Tampilkan halaman normal jika tidak ada parameter
             }
         }
 
