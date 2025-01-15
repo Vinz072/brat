@@ -11,9 +11,6 @@
             background-color: #f4f4f9;
             margin: 0;
             padding: 20px;
-        
-            
-            
             background-size: cover;
             background-position: center;
             height: 100vh;
@@ -42,25 +39,22 @@
         button:hover {
             background-color: #0056b3;
         }
-       footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #777;
-    background-color: #f4f4f9;
-    padding: 10px;
-    border-top: 1px solid #ccc;
-}
-}
-
-footer a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+            background-color: #f4f4f9;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -72,17 +66,17 @@ footer a:hover {
         <button onclick="downloadImage()">Download Gambar</button>
     </div>
     <canvas id="bratCanvas" width="512" height="512"></canvas>
-    <p>
-      creaded with ❤️ by <a href="https://tiktok.com/@vzproject72">Vz-Project</a>
-    </p>
+    <p>created with ❤️ by <a href="https://tiktok.com/@vzproject72">Vz-Project</a></p>
     <footer>
-    &copy; 2025 Vz-Project. Semua hak cipta dilindungi.
-</footer>
+        &copy; 2025 Vz-Project. Semua hak cipta dilindungi.
+    </footer>
+
     <script>
-        function generateBrat() {
+        // Fungsi utama untuk membuat brat
+        function generateBrat(input) {
             const canvas = document.getElementById('bratCanvas');
             const ctx = canvas.getContext('2d');
-            const text = document.getElementById('inputText').value.trim() || 'Brat';
+            const text = input || document.getElementById('inputText').value.trim() || 'Brat';
             const margin = 20;
 
             // Reset canvas
@@ -153,6 +147,7 @@ footer a:hover {
             }
         }
 
+        // Fungsi untuk menampilkan gambar secara fullscreen
         function viewFullImage() {
             const canvas = document.getElementById('bratCanvas');
             const imgURL = canvas.toDataURL('image/png');
@@ -162,6 +157,7 @@ footer a:hover {
             newTab.document.body.innerHTML = `<img src="${imgURL}" style="display: block; margin: auto; max-width: 100%; max-height: 100%;">`;
         }
 
+        // Fungsi untuk mengunduh gambar
         function downloadImage() {
             const canvas = document.getElementById('bratCanvas');
             const link = document.createElement('a');
@@ -169,29 +165,18 @@ footer a:hover {
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
-    
-    // Fungsi untuk mengambil nilai query parameter "text"
-    function getQueryParameter(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
 
-    // Menangani permintaan API berdasarkan URL
-    function handleApiRequest() {
-        const text = getQueryParameter('text'); // Ambil query parameter 'text'
-        if (text) {
-            // Lakukan sesuatu dengan teks yang diterima (misalnya tampilkan di halaman)
-            document.getElementById('output').innerText = 'Teks yang diminta: ' + text;
-        } else {
-            // Jika parameter tidak ada, beri tahu pengguna
-            document.getElementById('output').innerText = 'Teks tidak ditemukan.';
+        // Mendukung API dengan membaca parameter dari URL
+        function handleAPI() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const text = urlParams.get('text');
+            if (text) {
+                generateBrat(text);
+            }
         }
-    }
 
-    // Panggil API saat halaman dimuat
-    window.onload = handleApiRequest;
-</script>
-
-<div id="output"></div>
+        // Memanggil handleAPI ketika halaman dimuat
+        window.onload = handleAPI;
+    </script>
 </body>
 </html>
