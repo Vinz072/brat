@@ -13,8 +13,6 @@
             padding: 20px;
             background-size: cover;
             background-position: center;
-            height: 100vh;
-            display: none; /* Hanya untuk menyembunyikan halaman saat URL dengan ?text= digunakan */
         }
         canvas {
             border: 2px solid #ccc;
@@ -59,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Brat Generator By Vz-Project</h1>
+    <h1>Brat Generator by Vz-Project</h1>
     <textarea id="inputText" placeholder="Masukkan teks (maks 100 huruf)" maxlength="100"></textarea>
     <div>
         <button onclick="generateBrat()">Buat Brat</button>
@@ -147,22 +145,34 @@
             }
         }
 
-        // Fungsi untuk membuka gambar langsung
-        function openAsImage() {
+        // Fungsi untuk membuka gambar dalam fullscreen
+        function viewFullImage() {
             const canvas = document.getElementById('bratCanvas');
             const imgURL = canvas.toDataURL('image/png');
-            document.body.innerHTML = `<img src="${imgURL}" style="width: 100%; height: 100%;">`;
+            const newTab = window.open();
+            newTab.document.write(`<img src="${imgURL}" style="width: 100%; height: 100%;">`);
         }
 
-        // Mendukung API dengan membaca parameter dari URL
+        // Fungsi untuk mengunduh gambar
+        function downloadImage() {
+            const canvas = document.getElementById('bratCanvas');
+            const link = document.createElement('a');
+            link.download = 'brat-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Fungsi untuk menangani parameter URL
         function handleAPI() {
             const urlParams = new URLSearchParams(window.location.search);
             const text = urlParams.get('text');
             if (text) {
                 generateBrat(text);
-                setTimeout(openAsImage, 100); // Tunggu render canvas sebelum menampilkan sebagai gambar
-            } else {
-                document.body.style.display = 'block'; // Tampilkan halaman normal jika tidak ada parameter
+                setTimeout(() => {
+                    const canvas = document.getElementById('bratCanvas');
+                    const imgURL = canvas.toDataURL('image/png');
+                    document.body.innerHTML = `<img src="${imgURL}" style="width: 100%; height: 100%;">`;
+                }, 100); // Tunggu render canvas sebelum menampilkan gambar
             }
         }
 
