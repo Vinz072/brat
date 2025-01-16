@@ -13,172 +13,91 @@
             padding: 20px;
             background-size: cover;
             background-position: center;
+            height: 100vh;
         }
         canvas {
-            border: 2px solid #ccc;
-            margin-top: 20px;
-        }
-        textarea {
-            width: 80%;
-            height: 100px;
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 20px;
-            resize: none;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
-            background-color: #f4f4f9;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-        }
-        footer a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
+            display: none; /* Sembunyikan canvas jika menggunakan metode URL */
         }
     </style>
 </head>
 <body>
-    <h1>Brat Generator By Vz-Project</h1>
-    <textarea id="inputText" placeholder="Masukkan teks (maks 100 huruf)" maxlength="100"></textarea>
-    <div>
-        <button onclick="generateBrat()">Buat Brat</button>
-        <button onclick="viewFullImage()">Lihat Fullscreen</button>
-        <button onclick="downloadImage()">Download Gambar</button>
-    </div>
-    <canvas id="bratCanvas" width="512" height="512"></canvas>
-    <p>created with ❤️ by <a href="https://tiktok.com/@vzproject72">Vz-Project</a></p>
-    <footer>
-        &copy; 2025 Vz-Project. Semua hak cipta dilindungi.
-    </footer>
-
     <script>
-        function generateBrat(input) {
-            const canvas = document.getElementById('bratCanvas');
-            const ctx = canvas.getContext('2d');
-            const text = input || document.getElementById('inputText').value.trim() || 'Brat';
-            const margin = 20;
+        // Ambil parameter dari URL
+        const params = new URLSearchParams(window.location.search);
+        const text = params.get('text') || 'Brat';
+        const format = params.get('format') || 'png';
 
-            // Reset canvas
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Membuat canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        const margin = 20;
 
-            // Default font size and line height
-            let fontSize = 320;
-            const lineHeightMultiplier = 1.2;
+        // Reset canvas
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Ensure font size is not smaller than 2/10 of canvas width
-            const minFontSize = Math.floor(canvas.width * 0.1); // Minimal font size (10% of width)
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = 'black';
+        // Pengaturan font
+        let fontSize = 320;
+        const minFontSize = Math.floor(canvas.width * 0.1); // Font minimum
+        const lineHeightMultiplier = 1.2;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = 'black';
 
-            // Handle manual line breaks and splitting
-            const lines = text.split('\n');
-            ctx.font = `${fontSize}px Arial`;
+        // Pisahkan teks per baris
+        const lines = text.split('\n');
+        ctx.font = `${fontSize}px Arial`;
 
-            // Adjust font size to ensure all text fits in canvas, but not too small
-            while (true) {
-                let fits = true;
-                for (const line of lines) {
-                    const lineWidth = ctx.measureText(line).width;
-                    const totalHeight = lines.length * fontSize * lineHeightMultiplier;
-                    if (lineWidth + margin * 2 > canvas.width || totalHeight + margin * 2 > canvas.height) {
-                        fits = false;
-                        break;
-                    }
-                }
-                if (fits || fontSize <= minFontSize) break;
-                fontSize -= 5; // Reduce font size incrementally
-                ctx.font = `${fontSize}px Arial`;
-            }
-
-            // Draw text on canvas
-            const lineHeight = fontSize * lineHeightMultiplier;
-            let y = margin;
-            let maxWidth = canvas.width - margin * 2;
-
-            // Break long lines into multiple lines if necessary
+        // Sesuaikan ukuran font agar teks tidak keluar dari batas
+        while (true) {
+            let fits = true;
             for (const line of lines) {
-                let lineWidth = ctx.measureText(line).width;
-
-                // If the line width exceeds maxWidth, break it into words
-                if (lineWidth > maxWidth) {
-                    let words = line.split(' ');
-                    let currentLine = '';
-                    for (let word of words) {
-                        let testLine = currentLine + word + ' ';
-                        let testWidth = ctx.measureText(testLine).width;
-                        if (testWidth > maxWidth) {
-                            ctx.fillText(currentLine, margin, y);
-                            currentLine = word + ' ';
-                            y += lineHeight;
-                        } else {
-                            currentLine = testLine;
-                        }
-                    }
-                    ctx.fillText(currentLine, margin, y);
-                    y += lineHeight;
-                } else {
-                    // Normal case, no breaking needed
-                    ctx.fillText(line, margin, y);
-                    y += lineHeight;
+                const lineWidth = ctx.measureText(line).width;
+                const totalHeight = lines.length * fontSize * lineHeightMultiplier;
+                if (lineWidth + margin * 2 > canvas.width || totalHeight + margin * 2 > canvas.height) {
+                    fits = false;
+                    break;
                 }
             }
+            if (fits || fontSize <= minFontSize) break;
+            fontSize -= 5; // Kurangi font size
+            ctx.font = `${fontSize}px Arial`;
         }
 
-        // Fungsi untuk membuka gambar dalam fullscreen
-        function viewFullImage() {
-            const canvas = document.getElementById('bratCanvas');
-            const imgURL = canvas.toDataURL('image/png');
-            const newTab = window.open();
-            newTab.document.write(`<img src="${imgURL}" style="width: 100%; height: 100%;">`);
-        }
+        // Menggambar teks
+        const lineHeight = fontSize * lineHeightMultiplier;
+        let y = margin;
+        let maxWidth = canvas.width - margin * 2;
 
-        // Fungsi untuk mengunduh gambar
-        function downloadImage() {
-            const canvas = document.getElementById('bratCanvas');
-            const link = document.createElement('a');
-            link.download = 'brat-image.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-
-        // Fungsi untuk menangani parameter URL dan mengubah menjadi file gambar
-        function handleAPI() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const text = urlParams.get('text');
-            const format = urlParams.get('format') || 'png'; // Default ke PNG
-            if (text) {
-                generateBrat(text);
-                setTimeout(() => {
-                    const canvas = document.getElementById('bratCanvas');
-                    const imgURL = canvas.toDataURL(`image/${format}`);
-                    window.location.href = imgURL; // Redirect ke gambar
-                }, 100); // Tunggu render canvas sebelum menampilkan gambar
+        for (const line of lines) {
+            let lineWidth = ctx.measureText(line).width;
+            if (lineWidth > maxWidth) {
+                let words = line.split(' ');
+                let currentLine = '';
+                for (let word of words) {
+                    let testLine = currentLine + word + ' ';
+                    let testWidth = ctx.measureText(testLine).width;
+                    if (testWidth > maxWidth) {
+                        ctx.fillText(currentLine, margin, y);
+                        currentLine = word + ' ';
+                        y += lineHeight;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                ctx.fillText(currentLine, margin, y);
+                y += lineHeight;
+            } else {
+                ctx.fillText(line, margin, y);
+                y += lineHeight;
             }
         }
 
-        // Memanggil handleAPI ketika halaman dimuat
-        window.onload = handleAPI;
+        // Konversi ke format gambar
+        const imageData = canvas.toDataURL(`image/${format}`);
+        document.body.innerHTML = `<img src="${imageData}" style="display: block; margin: auto; max-width: 100%; max-height: 100%;">`;
     </script>
 </body>
 </html>
