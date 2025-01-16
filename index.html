@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <h1>Brat Generator by Vz-Project</h1>
+    <h1>Brat Generator By Vz-Project</h1>
     <textarea id="inputText" placeholder="Masukkan teks (maks 100 huruf)" maxlength="100"></textarea>
     <div>
         <button onclick="generateBrat()">Buat Brat</button>
@@ -86,7 +86,7 @@
             const lineHeightMultiplier = 1.2;
 
             // Ensure font size is not smaller than 2/10 of canvas width
-            const minFontSize = Math.floor(canvas.width * 0.2); // 2/10 of canvas width
+            const minFontSize = Math.floor(canvas.width * 0.1); // Minimal font size (10% of width)
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = 'black';
@@ -162,16 +162,17 @@
             link.click();
         }
 
-        // Fungsi untuk menangani parameter URL
+        // Fungsi untuk menangani parameter URL dan mengubah menjadi file gambar
         function handleAPI() {
             const urlParams = new URLSearchParams(window.location.search);
             const text = urlParams.get('text');
+            const format = urlParams.get('format') || 'png'; // Default ke PNG
             if (text) {
                 generateBrat(text);
                 setTimeout(() => {
                     const canvas = document.getElementById('bratCanvas');
-                    const imgURL = canvas.toDataURL('image/png');
-                    document.body.innerHTML = `<img src="${imgURL}" style="width: 100%; height: 100%;">`;
+                    const imgURL = canvas.toDataURL(`image/${format}`);
+                    window.location.href = imgURL; // Redirect ke gambar
                 }, 100); // Tunggu render canvas sebelum menampilkan gambar
             }
         }
